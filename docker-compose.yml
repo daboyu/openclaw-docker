@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  moltbot-gateway:
+    image: ghcr.io/phioranex/moltbot:latest
+    container_name: moltbot-gateway
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - ~/.clawdbot:/home/node/.clawdbot
+      - ~/clawd:/home/node/clawd
+    ports:
+      - "18789:18789"
+    environment:
+      - NODE_ENV=production
+    command: ["gateway", "start"]
+
+  moltbot-cli:
+    image: ghcr.io/phioranex/moltbot:latest
+    container_name: moltbot-cli
+    stdin_open: true
+    tty: true
+    volumes:
+      - ~/.clawdbot:/home/node/.clawdbot
+      - ~/clawd:/home/node/clawd
+    environment:
+      - NODE_ENV=production
+    entrypoint: ["node", "/app/dist/index.js"]
+    profiles:
+      - cli
