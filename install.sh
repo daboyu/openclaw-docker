@@ -4,10 +4,10 @@
 # One-command setup for OpenClaw on Docker
 #
 # Usage:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh)
+#   bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.sh)
 #
 # Or with options:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh) --no-start
+#   bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.sh) --no-start
 #
 
 set -e
@@ -23,9 +23,9 @@ NC='\033[0m' # No Color
 
 # Config
 INSTALL_DIR="${OPENCLAW_INSTALL_DIR:-$HOME/openclaw}"
-IMAGE="ghcr.io/phioranex/clawbot-docker:latest"
-REPO_URL="https://github.com/phioranex/clawbot-docker"
-COMPOSE_URL="https://raw.githubusercontent.com/phioranex/clawbot-docker/main/docker-compose.yml"
+IMAGE="ghcr.io/phioranex/openclaw-docker:latest"
+REPO_URL="https://github.com/phioranex/openclaw-docker"
+COMPOSE_URL="https://raw.githubusercontent.com/phioranex/openclaw-docker/main/docker-compose.yml"
 
 # Detect if we have a TTY (for Docker interactive mode)
 if [ -t 0 ]; then
