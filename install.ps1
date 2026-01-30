@@ -18,9 +18,9 @@ param(
 )
 
 # Config
-$Image = "ghcr.io/phioranex/clawbot-docker:latest"
-$RepoUrl = "https://github.com/phioranex/clawbot-docker"
-$ComposeUrl = "https://raw.githubusercontent.com/phioranex/clawbot-docker/main/docker-compose.yml"
+$Image = "ghcr.io/phioranex/openclaw-docker:latest"
+$RepoUrl = "https://github.com/phioranex/openclaw-docker"
+$ComposeUrl = "https://raw.githubusercontent.com/phioranex/openclaw-docker/main/docker-compose.yml"
 
 # Error handling
 $ErrorActionPreference = "Stop"
