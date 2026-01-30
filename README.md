@@ -13,7 +13,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/openclaw-docker/ma
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/daboyu/openclaw-docker/main/install.ps1 | iex
 ```
 
 > **Note for Windows users:** Make sure Docker Desktop is installed and running. You can also use WSL2 with the Linux installation command.
