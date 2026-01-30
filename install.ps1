@@ -28,20 +28,20 @@ $ErrorActionPreference = "Stop"
 # Functions
 function Write-Banner {
     Write-Host ""
-    Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Red
+    Write-Host "╔═════════════════════════════════════════════════════════════[...]"
     Write-Host "║                                                              ║" -ForegroundColor Red
     Write-Host "║    ____                    _____ _                           ║" -ForegroundColor Red
     Write-Host "║   / __ \                  / ____| |                          ║" -ForegroundColor Red
     Write-Host "║  | |  | |_ __   ___ _ __ | |    | | __ ___      __           ║" -ForegroundColor Red
     Write-Host "║  | |  | | '_ \ / _ \ '_ \| |    | |/ _`` \ \ /\ / /           ║" -ForegroundColor Red
     Write-Host "║  | |__| | |_) |  __/ | | | |____| | (_| |\ V  V /            ║" -ForegroundColor Red
-    Write-Host "║   \____/| .__/ \___|_| |_|\_____|_|\__,_| \_/\_/             ║" -ForegroundColor Red
+    Write-Host "║   \____/| .__/ \___|_| |_\_____|_|\__,_| \_/\_/             ║" -ForegroundColor Red
     Write-Host "║         | |                                                  ║" -ForegroundColor Red
     Write-Host "║         |_|                                                  ║" -ForegroundColor Red
     Write-Host "║                                                              ║" -ForegroundColor Red
     Write-Host "║              Docker Installer by Phioranex                   ║" -ForegroundColor Red
     Write-Host "║                                                              ║" -ForegroundColor Red
-    Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Red
+    Write-Host "╚═════════════════════════════════════════════════════════════[...]"
     Write-Host ""
 }
 
@@ -108,19 +108,29 @@ if (Test-Command docker) {
 }
 
 # Check Docker Compose
-$ComposeCmd = ""
+$ComposeCmd = @()
+$ComposeCmdString = ""
+
 if (docker compose version 2>$null) {
     Write-Success "Docker Compose found (plugin)"
-    $ComposeCmd = "docker compose"
+    $ComposeCmd = @("docker", "compose")
+    $ComposeCmdString = "docker compose"
 } elseif (Test-Command docker-compose) {
     Write-Success "Docker Compose found (standalone)"
-    $ComposeCmd = "docker-compose"
+    $ComposeCmd = @("docker-compose")
+    $ComposeCmdString = "docker-compose"
 } else {
     Write-Error "Docker Compose not found"
     Write-Host ""
     Write-Host "Docker Compose is required but not installed." -ForegroundColor Red
     Write-Host "It usually comes with Docker Desktop." -ForegroundColor Yellow
     exit 1
+}
+
+function Invoke-Compose {
+    param([string[]]$Args)
+    $prefix = if ($ComposeCmd.Length -gt 1) { $ComposeCmd[1..($ComposeCmd.Length - 1)] } else { @() }
+    & $ComposeCmd[0] @($prefix + $Args)
 }
 
 # Check Docker is running
@@ -177,10 +187,10 @@ if (-not $SkipOnboard) {
     Write-Host ""
     
     # Run onboarding
-    & $ComposeCmd.Split() run -T --rm openclaw-cli onboard
+    Invoke-Compose @("run", "-T", "--rm", "openclaw-cli", "onboard")
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Onboarding wizard was skipped or failed"
-        Write-Host "You can run it later with: cd $InstallDir && $ComposeCmd run --rm openclaw-cli onboard" -ForegroundColor Yellow
+        Write-Host "You can run it later with: cd $InstallDir && $ComposeCmdString run --rm openclaw-cli onboard" -ForegroundColor Yellow
     } else {
         Write-Success "Onboarding complete!"
     }
@@ -189,7 +199,7 @@ if (-not $SkipOnboard) {
 # Start gateway
 if (-not $NoStart) {
     Write-Step "Starting OpenClaw gateway..."
-    & $ComposeCmd.Split() up -d openclaw-gateway
+    Invoke-Compose @("up", "-d", "openclaw-gateway")
     
     # Wait for gateway to be ready
     Write-Host "Waiting for gateway to start" -NoNewline
@@ -221,11 +231,11 @@ if (-not $NoStart) {
 
 # Success message
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "╔═════════════════════════════════════════════════════════════[...]"
 Write-Host "║                                                              ║" -ForegroundColor Green
 Write-Host "║              🎉 OpenClaw installed successfully! 🎉           ║" -ForegroundColor Green
 Write-Host "║                                                              ║" -ForegroundColor Green
-Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "╚═════════════════════════════════════════════════════════════[...]"
 
 Write-Host ""
 Write-Host "Quick reference:" -ForegroundColor White
@@ -237,11 +247,11 @@ Write-Host "  Install dir:    $InstallDir" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Useful commands:" -ForegroundColor White
 Write-Host "  View logs:      docker logs -f openclaw-gateway" -ForegroundColor Cyan
-Write-Host "  Stop:           cd $InstallDir && $ComposeCmd down" -ForegroundColor Cyan
-Write-Host "  Start:          cd $InstallDir && $ComposeCmd up -d openclaw-gateway" -ForegroundColor Cyan
-Write-Host "  Restart:        cd $InstallDir && $ComposeCmd restart openclaw-gateway" -ForegroundColor Cyan
-Write-Host "  CLI:            cd $InstallDir && $ComposeCmd run --rm openclaw-cli <command>" -ForegroundColor Cyan
-Write-Host "  Update:         docker pull $Image && cd $InstallDir && $ComposeCmd up -d" -ForegroundColor Cyan
+Write-Host "  Stop:           cd $InstallDir && $ComposeCmdString down" -ForegroundColor Cyan
+Write-Host "  Start:          cd $InstallDir && $ComposeCmdString up -d openclaw-gateway" -ForegroundColor Cyan
+Write-Host "  Restart:        cd $InstallDir && $ComposeCmdString restart openclaw-gateway" -ForegroundColor Cyan
+Write-Host "  CLI:            cd $InstallDir && $ComposeCmdString run --rm openclaw-cli <command>" -ForegroundColor Cyan
+Write-Host "  Update:         docker pull $Image && cd $InstallDir && $ComposeCmdString up -d" -ForegroundColor Cyan
 
 Write-Host ""
 Write-Host "Documentation:  https://docs.openclaw.ai" -ForegroundColor White
